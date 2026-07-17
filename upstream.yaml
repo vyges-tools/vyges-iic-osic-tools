@@ -19,7 +19,7 @@ vyges:
   # The vyges CLI (cargo-dist binary release); `vyges install loom` then pulls the
   # engine suite from public vyges-tools/* releases.
   cli_release_repo: vyges-tools/cli
-  cli_version: "0.1.15"                 # TODO(bump): the upcoming suite release cuts this session
+  cli_version: "0.1.15"                 # Loom suite release 2026-07-17
   installer: vyges-installer.sh         # cargo-dist shell installer asset
   install_path: "~/.vyges/bin"          # on the default PATH (this is a Vyges container)
   loom: "vyges install loom"            # fetches loom foundation + all engines (drc/lvs/extract/char/sta-si/…)

@@ -6,7 +6,7 @@
 #
 #   docker build -f Dockerfile.compose \
 #     --build-arg UPSTREAM_DIGEST=sha256:<digest> \
-#     --build-arg VYGES_CLI_VERSION=0.1.14 \
+#     --build-arg VYGES_CLI_VERSION=0.1.15 \
 #     -t ghcr.io/vyges-tools/vyges-iic-osic-tools:iic-latest-loom0.1.15 .
 
 # Pinned IIC-OSIC-TOOLS (multi-arch). Digest — not tag — is the immutable identity.
