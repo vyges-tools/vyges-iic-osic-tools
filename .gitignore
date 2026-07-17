@@ -1,0 +1,5 @@
+# Build outputs / provenance are published as artifacts, never committed.
+/dist/
+manifest.json
+*.tar.gz
+.DS_Store

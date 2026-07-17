@@ -1,0 +1,24 @@
+{
+  "schema": "vyges-tool/1.0",
+  "tool": "vyges-iic-osic-tools",
+  "kind": "composition",
+  "description": "IIC-OSIC-TOOLS analog/mixed-signal toolbox composed with the Vyges CLI + Loom sign-off engines (on default PATH).",
+  "base": "docker.io/hpretl/iic-osic-tools",
+  "oss_baseline": {
+    "on_default_path": true,
+    "self_sufficient": true,
+    "tools": ["xschem", "ngspice", "xyce", "magic", "netgen", "klayout", "cace"],
+    "pdks": ["sky130A", "gf180mcuD", "ihp-sg13g2", "ihp-sg13cmos5l"]
+  },
+  "loom_layer": {
+    "on_default_path": true,
+    "install_path": "~/.vyges/bin",
+    "front_door": "vyges",
+    "engines": ["vyges-loom", "vyges-drc", "vyges-lvs", "vyges-extract", "vyges-char", "vyges-sta-si", "vyges-em-ir", "vyges-power", "vyges-layout"],
+    "offline_runtime": true
+  },
+  "invoke": {
+    "oss_example": "klayout -v",
+    "loom_example": "vyges-lvs run job.lvs"
+  }
+}

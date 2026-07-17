@@ -1,0 +1,26 @@
+vyges-iic-osic-tools
+Copyright 2026 Vyges (https://vyges.com)
+
+This repository's tooling (Dockerfile.compose, scripts, workflows) is licensed
+under the Apache License, Version 2.0 (see LICENSE).
+
+This repository composes, but does not vendor, third-party software. The built
+image contains:
+
+  - IIC-OSIC-TOOLS (docker.io/hpretl/iic-osic-tools) and the EDA tools + open
+    PDKs it bundles. The IIC-OSIC-TOOLS recipe is Apache-2.0; each bundled tool
+    and PDK is distributed under its own license and retained unchanged.
+
+  - The Vyges layer, installed at build time from public vyges-tools/* releases:
+      * vyges-loom (design-data foundation) — Apache-2.0.
+      * the vyges CLI — closed-source, distributed as a binary only.
+      * per-foundry calibration data and plugins, where applicable, are
+        distributed separately under their own terms and are not part of this
+        repository.
+
+The OSS sign-off path (KLayout / magic / netgen / ngspice + PDKs) is complete and
+self-sufficient, and never depends on a non-open Vyges component — even though the
+Vyges CLI is on the default PATH in this Vyges container.
+
+Each build's exact upstream image digest and Vyges component versions/licenses
+are recorded in the image's manifest.json.

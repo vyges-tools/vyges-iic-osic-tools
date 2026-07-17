@@ -1,0 +1,32 @@
+# vyges-iic-osic-tools pins — the source of truth for what we compose.
+#
+# Self-contained: this repo vendors nothing in-tree. CI derives FROM the pinned
+# IIC-OSIC-TOOLS image digest and installs the pinned Vyges release on top.
+# `sync.yml` bumps these (opening a PR) when a new upstream release lands.
+
+iic_osic_tools:
+  # The prebuilt, multi-arch (amd64 + arm64) open analog toolbox we compose over.
+  source: docker.io/hpretl/iic-osic-tools
+  # Pinned to `latest` as of 2026-07-17 to move now; releases are dispatched
+  # manually (release.yml is workflow_dispatch-only). Re-pin to the sg13cmos5l-
+  # focused July 2026 release when it lands (per FSiC it targets ihp-sg13cmos5l).
+  #   re-resolve: docker buildx imagetools inspect hpretl/iic-osic-tools:latest
+  tag: "latest"
+  digest: "sha256:7371bae55da486f492cc270ea6137c4fcf3b11971de7a4506a74f62be143537a"
+  arch: [amd64, arm64]
+
+vyges:
+  # The vyges CLI (cargo-dist binary release); `vyges install loom` then pulls the
+  # engine suite from public vyges-tools/* releases.
+  cli_release_repo: vyges-tools/cli
+  cli_version: "0.1.14"                 # TODO(bump): the upcoming suite release cuts this session
+  installer: vyges-installer.sh         # cargo-dist shell installer asset
+  install_path: "~/.vyges/bin"          # on the default PATH (this is a Vyges container)
+  loom: "vyges install loom"            # fetches loom foundation + all engines (drc/lvs/extract/char/sta-si/…)
+  offline_runtime: true                 # std-only Rust; no cloud pings after build; manual updates
+
+license:
+  tooling_spdx: Apache-2.0              # this repo's Dockerfile/scripts/workflows
+  iic_osic_tools_spdx: Apache-2.0       # upstream recipe; bundled tools/PDKs keep their own terms
+  loom_core_spdx: Apache-2.0           # vyges-loom foundation (LICENSE/NOTICE)
+  vyges_note: "vyges CLI closed-source (binary-only); per-foundry calibration/plugins separate terms — see image NOTICE"

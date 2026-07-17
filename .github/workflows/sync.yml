@@ -1,0 +1,29 @@
+name: sync
+# Watch upstream releases and open a PR that bumps the pins in upstream.yaml.
+# Non-destructive: proposes, never auto-merges.
+on:
+  schedule:
+    - cron: "0 7 * * 1"        # weekly, Monday 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-pins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report newest upstream releases (informational)
+        run: |
+          echo "## Pin freshness" >> "$GITHUB_STEP_SUMMARY"
+          echo "- IIC-OSIC-TOOLS tags: https://hub.docker.com/r/hpretl/iic-osic-tools/tags" >> "$GITHUB_STEP_SUMMARY"
+          echo "- vyges CLI latest:" >> "$GITHUB_STEP_SUMMARY"
+          gh release view --repo vyges-tools/cli --json tagName --jq '.tagName' >> "$GITHUB_STEP_SUMMARY" || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: TODO — diff pins and open a bump PR
+        run: |
+          echo "Follow-up: resolve the newest IIC-OSIC-TOOLS digest + vyges CLI tag,"
+          echo "and if either differs from upstream.yaml, open a PR bumping it."

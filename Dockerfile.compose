@@ -1,0 +1,68 @@
+# vyges-iic-osic-tools — compose the Vyges CLI + Loom sign-off engines onto
+# IIC-OSIC-TOOLS. This is a *Vyges* container, so the Vyges CLI is on the DEFAULT
+# PATH (being on PATH does not force its use — the full OSS flow is untouched and
+# usable exactly as upstream; an agent/user can drive vyges seamlessly).
+# Build needs network (fetch the Vyges binaries); runtime is offline.
+#
+#   docker build -f Dockerfile.compose \
+#     --build-arg UPSTREAM_DIGEST=sha256:<digest> \
+#     --build-arg VYGES_CLI_VERSION=0.1.14 \
+#     -t ghcr.io/vyges-tools/vyges-iic-osic-tools:iic-latest-loom0.1.14 .
+
+# Pinned IIC-OSIC-TOOLS (multi-arch). Digest — not tag — is the immutable identity.
+ARG UPSTREAM_IMAGE=docker.io/hpretl/iic-osic-tools
+ARG UPSTREAM_DIGEST=sha256:7371bae55da486f492cc270ea6137c4fcf3b11971de7a4506a74f62be143537a
+FROM ${UPSTREAM_IMAGE}@${UPSTREAM_DIGEST}
+
+ARG VYGES_CLI_VERSION=0.1.14
+ARG VYGES_CLI_REPO=vyges-tools/cli
+# The base image runs as uid 1000 with HOME=/headless and PDK_ROOT=/foss/pdks.
+ARG VHOME=/headless
+ARG BASE_PDK_DIR=/foss/pdks/ihp-sg13cmos5l
+
+# 1) Install the vyges CLI (cargo-dist shell installer → $HOME/.vyges/bin).
+# 2) Fetch the whole Loom suite (foundation + engines) from public vyges-tools/* releases.
+RUN set -eux; \
+    curl -fsSL "https://github.com/${VYGES_CLI_REPO}/releases/download/v${VYGES_CLI_VERSION}/vyges-installer.sh" | sh; \
+    "${VHOME}/.vyges/bin/vyges" install loom
+
+# Vyges CLI + engines on the DEFAULT PATH — this is a Vyges container.
+# The base image assembles PATH in its login profile / entrypoint (Config.Env PATH
+# is minimal and would be overridden at runtime). /headless/.local/bin IS on that
+# assembled PATH, so symlink the Vyges binaries there — robust for both `docker run`
+# (entrypoint) and login shells. A belt-and-braces ENV prepend covers non-login sh.
+RUN set -eux; \
+    mkdir -p /headless/.local/bin; \
+    ln -sf /headless/.vyges/bin/* /headless/.local/bin/
+ENV PATH="/headless/.vyges/bin:${PATH}"
+
+# PDK wiring — resolve the base image's PDK with NO PDK_ROOT env: materialize it
+# under the managed ~/.vyges/pdk-store and repoint the descriptor root at $HOME
+# (always set). --copy (not --symlink): the PDK is only ~88 MB (negligible vs the
+# base image), and a WRITABLE copy lets the engines cache derived rules
+# (vyges-extract's RC rules) inside the PDK tree — a symlink to the read-only
+# /foss/pdks would fail that write. See scripts/pdk-import.sh (fetches the
+# descriptor from the catalog if absent).
+COPY --chown=1000:1000 scripts/pdk-import.sh ${VHOME}/.vyges/pdk-import.sh
+RUN set -eux; \
+    bash "${VHOME}/.vyges/pdk-import.sh" ihp_sg13cmos5l "${BASE_PDK_DIR}" --copy
+
+# Descriptor for the vyges resolve/MCP discovery layer.
+COPY --chown=1000:1000 vyges-tool.json ${VHOME}/.vyges/vyges-tool.json
+
+# Smoke-gate the build (login shell — so the base image's /foss/tools are on PATH):
+# the OSS baseline runs, the Vyges engines run on the assembled PATH, and the PDK
+# resolves with NO PDK_ROOT/IHP_PDK_ROOT — or the build fails.
+RUN ["/bin/bash", "-lc", "set -eux; \
+    klayout -v; \
+    vyges-lvs --version; \
+    vyges-extract --version; \
+    env -u PDK_ROOT -u IHP_PDK_ROOT vyges-extract gen-rc --pdk ihp_sg13cmos5l >/dev/null"]
+
+LABEL org.opencontainers.image.title="vyges-iic-osic-tools" \
+      org.opencontainers.image.source="https://github.com/vyges-tools/vyges-iic-osic-tools" \
+      org.opencontainers.image.description="IIC-OSIC-TOOLS composed with the Vyges CLI + Loom sign-off engines (on default PATH)." \
+      com.vyges.tool="vyges-iic-osic-tools" \
+      com.vyges.tool.kind="composition" \
+      com.vyges.tool.base="hpretl/iic-osic-tools" \
+      com.vyges.tool.descriptor="/headless/.vyges/vyges-tool.json"

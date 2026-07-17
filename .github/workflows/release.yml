@@ -1,0 +1,48 @@
+name: release
+# Build + push a pinned composition, then record it in index.json.
+# Dispatch-only (mirrors the vyges suite's release policy).
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "release tag, e.g. iic2026.07-loom0.1.14"
+        required: true
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard — upstream digest must be pinned (no TODO)
+        run: |
+          if grep -qE 'digest:\s*"?sha256:TODO' upstream.yaml; then
+            echo "::error::upstream.yaml iic_osic_tools.digest is still a TODO placeholder."
+            exit 2
+          fi
+
+      - name: Set up buildx (multi-arch)
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to ghcr
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Composes for amd64 + arm64 (both the base and the Vyges CLI are multi-arch).
+      - name: Compose + push
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          IMAGE=ghcr.io/${{ github.repository_owner }}/vyges-iic-osic-tools \
+            scripts/build.sh --push
+
+      - name: TODO — emit provenance + update index.json
+        run: |
+          echo "Follow-up: run scripts/provenance.sh and append the build row to index.json,"
+          echo "then commit index.json (see vyges-openroad update-index.sh for the pattern)."
