@@ -7,14 +7,14 @@
 #   docker build -f Dockerfile.compose \
 #     --build-arg UPSTREAM_DIGEST=sha256:<digest> \
 #     --build-arg VYGES_CLI_VERSION=0.1.14 \
-#     -t ghcr.io/vyges-tools/vyges-iic-osic-tools:iic-latest-loom0.1.14 .
+#     -t ghcr.io/vyges-tools/vyges-iic-osic-tools:iic-latest-loom0.1.15 .
 
 # Pinned IIC-OSIC-TOOLS (multi-arch). Digest — not tag — is the immutable identity.
 ARG UPSTREAM_IMAGE=docker.io/hpretl/iic-osic-tools
 ARG UPSTREAM_DIGEST=sha256:7371bae55da486f492cc270ea6137c4fcf3b11971de7a4506a74f62be143537a
 FROM ${UPSTREAM_IMAGE}@${UPSTREAM_DIGEST}
 
-ARG VYGES_CLI_VERSION=0.1.14
+ARG VYGES_CLI_VERSION=0.1.15
 ARG VYGES_CLI_REPO=vyges-tools/cli
 # The base image runs as uid 1000 with HOME=/headless and PDK_ROOT=/foss/pdks.
 ARG VHOME=/headless

@@ -40,7 +40,7 @@ Or consume via the Vyges CLI `tools.json`:
 ```jsonc
 { "tools": { "analog-eda": { "container": {
     "runtime": "docker",
-    "image": "ghcr.io/vyges-tools/vyges-iic-osic-tools:iic2026.07-loom0.1.14",
+    "image": "ghcr.io/vyges-tools/vyges-iic-osic-tools:iic2026.07-loom0.1.15",
     "mounts": ["${PDK_ROOT}:${PDK_ROOT}:ro"]
 } } } }
 ```
@@ -53,14 +53,14 @@ and the Vyges Loom release — both visible in the tag.
 | Tag | Meaning |
 |---|---|
 | `:sha-<digest12>` | immutable — one composition (upstream digest × loom version) |
-| `:iic2026.07-loom0.1.14` | a pinned release (frozen), alias to a `sha-<…>` |
+| `:iic2026.07-loom0.1.15` | a pinned release (frozen), alias to a `sha-<…>` |
 | `:latest` | moves to the newest pinned release |
 
 `index.json` is the lookup table (upstream digest × loom version → image):
 
 ```sh
 scripts/which.sh latest
-scripts/which.sh iic2026.07-loom0.1.14
+scripts/which.sh iic2026.07-loom0.1.15
 ```
 
 ## How it's built
@@ -83,7 +83,7 @@ Workflows: `release.yml` (build + push a pinned composition → `ghcr` + `index.
 
 Edit **`upstream.yaml`** (`iic_osic_tools.digest` and/or `vyges.cli_version`) — the
 source of truth — then run the `release` workflow with a `version`
-(e.g. `iic2026.07-loom0.1.14`).
+(e.g. `iic2026.07-loom0.1.15`).
 
 ## Licensing
 
