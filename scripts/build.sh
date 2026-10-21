@@ -5,7 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-y() { grep -E "^\s*$1:" upstream.yaml | head -1 | sed -E 's/.*:\s*"?([^"#]+)"?.*/\1/' | xargs; }
+# the value after the KEY's colon (a digest carries a colon of its own: `sha256:…`)
+y() { grep -E "^\s*$1:" upstream.yaml | head -1 | sed -E "s/^[[:space:]]*$1:[[:space:]]*\"?([^\"#]+)\"?.*/\1/" | xargs; }
 UPSTREAM_IMAGE="$(y source)"
 UPSTREAM_DIGEST="$(y digest)"
 CLI_VERSION="$(y cli_version)"

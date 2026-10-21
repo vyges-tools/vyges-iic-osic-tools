@@ -7,19 +7,18 @@
 iic_osic_tools:
   # The prebuilt, multi-arch (amd64 + arm64) open analog toolbox we compose over.
   source: docker.io/hpretl/iic-osic-tools
-  # Pinned to `latest` as of 2026-07-17 to move now; releases are dispatched
-  # manually (release.yml is workflow_dispatch-only). Re-pin to the sg13cmos5l-
-  # focused July 2026 release when it lands (per FSiC it targets ihp-sg13cmos5l).
-  #   re-resolve: docker buildx imagetools inspect hpretl/iic-osic-tools:latest
-  tag: "latest"
-  digest: "sha256:7371bae55da486f492cc270ea6137c4fcf3b11971de7a4506a74f62be143537a"
+  # Pinned to the 2026.10 release (2026-10-15): it builds ngspice-47 (2026.07 / the July `latest`
+  # built ngspice-46). Releases are dispatched manually (release.yml is workflow_dispatch-only).
+  #   re-resolve: docker buildx imagetools inspect hpretl/iic-osic-tools:<tag>
+  tag: "2026.10"
+  digest: "sha256:306585de35d198e70ea58950f77147c86f56c698726a19afea9f1c83009557be"
   arch: [amd64, arm64]
 
 vyges:
   # The vyges CLI (cargo-dist binary release); `vyges install loom` then pulls the
   # engine suite from public vyges-tools/* releases.
   cli_release_repo: vyges-tools/cli
-  cli_version: "0.1.15"                 # Loom suite release 2026-07-17
+  cli_version: "0.1.43"                 # Loom suite release 2026-10-20
   installer: vyges-installer.sh         # cargo-dist shell installer asset
   install_path: "~/.vyges/bin"          # on the default PATH (this is a Vyges container)
   loom: "vyges install loom"            # fetches loom foundation + all engines (drc/lvs/extract/char/sta-si/…)
