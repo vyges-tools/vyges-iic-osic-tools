@@ -14,7 +14,7 @@ jobs:
   check-pins:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Report newest upstream releases (informational)
         run: |
           echo "## Pin freshness" >> "$GITHUB_STEP_SUMMARY"
